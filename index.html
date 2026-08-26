@@ -34,22 +34,21 @@
 
         .header p {
             font-size: 15px;
-            opacity: 0.95;
         }
 
         .container {
             max-width: 600px;
             margin: auto;
-            padding: 25px 18px;
+            padding: 24px 18px;
         }
 
         .welcome {
-            margin-bottom: 22px;
+            margin-bottom: 20px;
         }
 
         .welcome h2 {
             font-size: 22px;
-            margin-bottom: 6px;
+            margin-bottom: 7px;
         }
 
         .welcome p {
@@ -65,11 +64,26 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.07);
         }
 
-        .card button {
+        .icon {
+            font-size: 34px;
+            margin-bottom: 10px;
+        }
+
+        .card h3 {
+            margin-bottom: 7px;
+        }
+
+        .card p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        button {
             width: 100%;
             border: none;
-            border-radius: 14px;
-            padding: 16px;
+            border-radius: 13px;
+            padding: 15px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
@@ -77,41 +91,54 @@
             color: white;
         }
 
-        .card button:hover {
-            opacity: 0.9;
+        button.secondary {
+            background: #e8f4f3;
+            color: #08756f;
+            margin-top: 10px;
         }
 
-        .icon {
-            font-size: 34px;
-            margin-bottom: 10px;
+        input[type="file"] {
+            display: none;
         }
 
-        .card h3 {
-            margin-bottom: 6px;
+        #previewContainer {
+            display: none;
+            margin-top: 18px;
         }
 
-        .card p {
-            color: #6b7280;
-            font-size: 14px;
-            margin-bottom: 14px;
+        #previewImage {
+            width: 100%;
+            max-height: 350px;
+            object-fit: contain;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
         }
 
-        .search-box {
-            display: flex;
-            gap: 8px;
+        #ocrSection {
+            display: none;
+            margin-top: 18px;
         }
 
-        .search-box input {
-            flex: 1;
+        #ocrResult {
+            width: 100%;
+            min-height: 180px;
             padding: 14px;
             border: 1px solid #d1d5db;
             border-radius: 12px;
+            resize: vertical;
             font-size: 15px;
+            line-height: 1.5;
         }
 
-        .search-box button {
-            width: auto;
-            padding: 14px 18px;
+        .status {
+            display: none;
+            margin-top: 15px;
+            padding: 13px;
+            border-radius: 12px;
+            background: #eef6ff;
+            color: #315b85;
+            text-align: center;
+            font-size: 14px;
         }
 
         .footer {
@@ -125,169 +152,331 @@
 
 <body>
 
-    <header class="header">
-        <h1>💊 MedAssist</h1>
-        <p>Your Smart Medicine Assistant</p>
-    </header>
+<header class="header">
+    <h1>💊 MedAssist</h1>
+    <p>Your Smart Medicine Assistant</p>
+</header>
 
-    <main class="container">
+<main class="container">
 
-        <section class="welcome">
-            <h2>Welcome to MedAssist</h2>
-            <p>Understand your prescription and medicine information more easily.</p>
-        </section>
+    <section class="welcome">
+        <h2>Welcome to MedAssist</h2>
+        <p>
+            Understand your prescription and medicine information more easily.
+        </p>
+    </section>
 
-        <!-- Take Photo OCR -->
-        <div class="card">
-            <div class="icon">📷</div>
 
-            <h3>Take Prescription Photo</h3>
+    <!-- Gallery OCR -->
 
-            <p>
-                Take a photo of your prescription and extract the medicine names.
-            </p>
+    <div class="card">
 
-            <button onclick="takePhoto()">
-                Take Photo
-            </button>
-        </div>
+        <div class="icon">🖼️</div>
 
-        <!-- Gallery OCR -->
-        <div class="card">
-            <div class="icon">🖼️</div>
+        <h3>Prescription OCR</h3>
 
-            <h3>Upload from Gallery</h3>
+        <p>
+            Select a prescription image from your phone gallery.
+        </p>
 
-            <p>
-                Select a prescription image from your phone gallery.
-            </p>
+        <input
+            type="file"
+            id="galleryInput"
+            accept="image/*"
+            onchange="imageSelected(event)"
+        >
 
-            <input
-                type="file"
-                id="galleryInput"
-                accept="image/*"
-                style="display:none"
-                onchange="gallerySelected(event)"
+        <button onclick="openGallery()">
+            Choose Prescription Image
+        </button>
+
+
+        <div id="previewContainer">
+
+            <h3 style="margin: 15px 0 10px;">
+                Image Preview
+            </h3>
+
+            <img
+                id="previewImage"
+                alt="Prescription preview"
             >
 
-            <button onclick="openGallery()">
-                Choose Image
+            <button
+                onclick="startOCR()"
+                style="margin-top: 12px;"
+            >
+                🔍 Start OCR
             </button>
-        </div>
 
-        <!-- Medicine Search -->
-        <div class="card">
-            <div class="icon">🔎</div>
-
-            <h3>Search Medicine</h3>
-
-            <p>
-                Search for medicine information.
-            </p>
-
-            <div class="search-box">
-                <input
-                    type="text"
-                    id="medicineInput"
-                    placeholder="Enter medicine name"
-                >
-
-                <button onclick="searchMedicine()">
-                    Search
-                </button>
-            </div>
-        </div>
-
-        <!-- AI Assistant -->
-        <div class="card">
-            <div class="icon">🤖</div>
-
-            <h3>AI Medicine Assistant</h3>
-
-            <p>
-                Ask questions about medicines and prescriptions.
-            </p>
-
-            <button onclick="openAssistant()">
-                Ask AI Assistant
+            <button
+                class="secondary"
+                onclick="clearImage()"
+            >
+                ✕ Choose Another Image
             </button>
+
         </div>
 
-    </main>
 
-    <footer class="footer">
-        © 2026 MedAssist
-    </footer>
+        <div id="ocrStatus" class="status">
+            Processing prescription...
+        </div>
 
 
-    <script>
+        <div id="ocrSection">
 
-        function takePhoto() {
+            <h3 style="margin: 18px 0 10px;">
+                📝 OCR Result
+            </h3>
+
+            <textarea
+                id="ocrResult"
+                placeholder="OCR text will appear here..."
+            ></textarea>
+
+            <button
+                class="secondary"
+                onclick="copyOCR()"
+            >
+                📋 Copy Text
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Medicine Search -->
+
+    <div class="card">
+
+        <div class="icon">🔎</div>
+
+        <h3>Search Medicine</h3>
+
+        <p>
+            Search for medicine information.
+        </p>
+
+        <input
+            type="text"
+            id="medicineInput"
+            placeholder="Enter medicine name"
+            style="
+                width:100%;
+                padding:14px;
+                border:1px solid #d1d5db;
+                border-radius:12px;
+                font-size:15px;
+                margin-bottom:10px;
+            "
+        >
+
+        <button onclick="searchMedicine()">
+            Search Medicine
+        </button>
+
+    </div>
+
+
+    <!-- AI Assistant -->
+
+    <div class="card">
+
+        <div class="icon">🤖</div>
+
+        <h3>AI Medicine Assistant</h3>
+
+        <p>
+            Ask questions about medicines and prescriptions.
+        </p>
+
+        <button onclick="openAssistant()">
+            Ask AI Assistant
+        </button>
+
+    </div>
+
+</main>
+
+
+<footer class="footer">
+    © 2026 MedAssist
+</footer>
+
+
+<script>
+
+    let selectedImage = null;
+
+
+    function openGallery() {
+
+        document
+            .getElementById("galleryInput")
+            .click();
+
+    }
+
+
+    function imageSelected(event) {
+
+        const file = event.target.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        selectedImage = file;
+
+        const imageURL = URL.createObjectURL(file);
+
+        const preview =
+            document.getElementById("previewImage");
+
+        preview.src = imageURL;
+
+        document
+            .getElementById("previewContainer")
+            .style.display = "block";
+
+        document
+            .getElementById("ocrSection")
+            .style.display = "none";
+
+    }
+
+
+    function startOCR() {
+
+        if (!selectedImage) {
 
             alert(
-                "Camera OCR will be connected in the next step."
+                "Please select a prescription image first."
             );
 
+            return;
         }
 
 
-        function openGallery() {
+        const status =
+            document.getElementById("ocrStatus");
+
+        status.style.display = "block";
+
+        status.innerText =
+            "OCR engine will be connected in the next step...";
+
+
+        setTimeout(function () {
 
             document
-                .getElementById("galleryInput")
-                .click();
+                .getElementById("ocrSection")
+                .style.display = "block";
 
+            document
+                .getElementById("ocrResult")
+                .value =
+                "OCR is ready for integration.\n\n" +
+                "The real prescription text extraction " +
+                "will be connected next.";
+
+            status.style.display = "none";
+
+        }, 1000);
+
+    }
+
+
+    function clearImage() {
+
+        selectedImage = null;
+
+        document
+            .getElementById("galleryInput")
+            .value = "";
+
+        document
+            .getElementById("previewContainer")
+            .style.display = "none";
+
+        document
+            .getElementById("ocrSection")
+            .style.display = "none";
+
+        document
+            .getElementById("ocrStatus")
+            .style.display = "none";
+
+    }
+
+
+    function copyOCR() {
+
+        const text =
+            document
+            .getElementById("ocrResult")
+            .value;
+
+        if (!text) {
+
+            alert("There is no text to copy.");
+
+            return;
         }
 
+        navigator.clipboard
+            .writeText(text)
+            .then(function () {
 
-        function gallerySelected(event) {
+                alert("OCR text copied.");
 
-            const file = event.target.files[0];
-
-            if (!file) {
-                return;
-            }
-
-            alert(
-                "Image selected successfully: " + file.name
-            );
-
-        }
-
-
-        function searchMedicine() {
-
-            const medicine =
-                document
-                .getElementById("medicineInput")
-                .value
-                .trim();
-
-            if (!medicine) {
+            })
+            .catch(function () {
 
                 alert(
-                    "Please enter a medicine name."
+                    "Unable to copy automatically."
                 );
 
-                return;
-            }
+            });
+
+    }
+
+
+    function searchMedicine() {
+
+        const medicine =
+            document
+            .getElementById("medicineInput")
+            .value
+            .trim();
+
+        if (!medicine) {
 
             alert(
-                "Medicine search for: " + medicine
+                "Please enter a medicine name."
             );
 
+            return;
         }
 
+        alert(
+            "Medicine search will be connected next."
+        );
 
-        function openAssistant() {
+    }
 
-            alert(
-                "AI Assistant will be connected in the next step."
-            );
 
-        }
+    function openAssistant() {
 
-    </script>
+        alert(
+            "AI Assistant will be connected after the backend is ready."
+        );
+
+    }
+
+</script>
 
 </body>
 </html>
