@@ -5,1183 +5,187 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
-<title>MedAssist - Smart Prescription OCR</title>
+<title>MedAssist - Prescription OCR</title>
 
-<!-- Tesseract.js -->
-<script src="https://unpkg.com/tesseract.js@5.0.5/dist/tesseract.min.js"></script>
+<!--
+====================================================
+ TESSERACT.JS 4.1.1
+ Using the older stable worker API.
+ No SIMD core is manually configured.
+====================================================
+-->
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
+
 
 <style>
 
-*{
-  box-sizing:border-box;
+/* ==================================================
+   BASIC
+================================================== */
+
+* {
+  box-sizing: border-box;
 }
 
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f5fafb;
-  color:#173b3d;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5fafb;
+  color: #173b3d;
 }
 
-.container{
-  width:100%;
-  max-width:650px;
-  margin:auto;
-  padding:0 16px 50px;
-}
-
-/* HEADER */
-
-.header{
-  background:#109b96;
-  color:white;
-  text-align:center;
-  padding:30px 15px;
-  margin:0 -16px 25px;
-  border-radius:0 0 35px 35px;
-}
-
-.header h1{
-  margin:0;
-  font-size:34px;
-}
-
-.header p{
-  margin:8px 0 0;
-  font-size:17px;
-}
-
-/* CARD */
-
-.card{
-  background:white;
-  border-radius:24px;
-  padding:20px;
-  box-shadow:0 5px 20px rgba(0,0,0,.08);
-}
-
-.title{
-  font-size:25px;
-  font-weight:bold;
-  margin-bottom:8px;
-}
-
-.description{
-  color:#687878;
-  line-height:1.5;
-  margin-bottom:20px;
-}
-
-/* FILE INPUT */
-
-#imageInput{
-  display:none;
-}
-
-.upload{
-  display:block;
-  width:100%;
-  padding:18px;
-  background:#109b96;
-  color:white;
-  border-radius:18px;
-  text-align:center;
-  font-size:18px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-/* PREVIEW */
-
-#preview{
-  width:100%;
-  max-height:550px;
-  object-fit:contain;
-  display:none;
-  margin-top:15px;
-  border-radius:18px;
-}
-
-/* BUTTONS */
-
-button{
-  width:100%;
-  border:0;
-  border-radius:20px;
-  padding:18px;
-  margin-top:14px;
-  font-size:18px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-#ocrBtn{
-  background:#109b96;
-  color:white;
-}
-
-#ocrBtn:disabled{
-  background:#9dbfbd;
-  cursor:not-allowed;
-}
-
-#chooseBtn{
-  background:#e5f4f5;
-  color:#087f7b;
-}
-
-#copyBtn{
-  background:#e5f4f5;
-  color:#087f7b;
-}
-
-/* PROGRESS */
-
-#progress{
-  margin-top:15px;
-  padding:14px;
-  background:#e5f4f5;
-  border-radius:14px;
-  color:#087f7b;
-  text-align:center;
-  font-weight:bold;
-  min-height:48px;
-}
-
-/* ERROR */
-
-#errorBox{
-  display:none;
-  margin-top:15px;
-  padding:16px;
-  background:#fff0f0;
-  border:1px solid #ffcccc;
-  color:#a00000;
-  border-radius:14px;
-  line-height:1.5;
-  word-break:break-word;
-}
-
-/* RESULT */
-
-.section-title{
-  margin-top:28px;
-  font-size:25px;
-  font-weight:bold;
-}
-
-#result{
-  width:100%;
-  min-height:250px;
-  margin-top:12px;
-  padding:18px;
-  border:1px solid #ddd;
-  border-radius:18px;
-  background:white;
-  font-family:Arial,sans-serif;
-  font-size:17px;
-  line-height:1.7;
-  resize:vertical;
-}
-
-/* MEDICINE */
-
-#medicineBox{
-  display:none;
-  margin-top:22px;
-  background:white;
-  border-radius:20px;
-  padding:20px;
-  box-shadow:0 4px 15px rgba(0,0,0,.07);
-}
-
-#medicineBox h2{
-  margin-top:0;
-  color:#087f7b;
-}
-
-.medicine{
-  padding:14px 0;
-  border-bottom:1px solid #eee;
-}
-
-.medicine-name{
-  font-size:18px;
-  font-weight:bold;
-}
-
-.medicine-match{
-  margin-top:5px;
-  font-size:14px;
-  color:#777;
-}
-
-.search-button{
-  background:#109b96;
-  color:white;
-  padding:12px 16px;
-  border-radius:12px;
-  display:inline-block;
-  margin-top:10px;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-/* NOTE */
-
-.note{
-  margin-top:22px;
-  padding:15px;
-  background:#fff8e1;
-  border-radius:14px;
-  color:#665500;
-  font-size:13px;
-  line-height:1.5;
-}
-
-</style>
-
-</head>
-
-
-<body>
-
-<div class="container">
-
-
-<!-- HEADER -->
-
-<div class="header">
-
-<h1>💊 MedAssist</h1>
-
-<p>Your Smart Medicine Assistant</p>
-
-</div>
-
-
-<!-- OCR CARD -->
-
-<div class="card">
-
-<div class="title">
-📝 Prescription OCR
-</div>
-
-<div class="description">
-Select a prescription image from your Gallery or Files.
-MedAssist will extract the prescription text and identify
-possible medicine names.
-</div>
-
-
-<!--
-IMPORTANT:
-No capture="environment" here.
-This means Android will NOT automatically open Camera.
-The normal Gallery/File Picker will open.
--->
-
-<label
-  class="upload"
-  for="imageInput"
->
-📷 Choose Prescription Image
-</label>
-
-
-<input
-  type="file"
-  id="imageInput"
-  accept="image/*"
->
-
-
-<img
-  id="preview"
-  alt="Prescription Preview"
->
-
-
-<button
-  id="ocrBtn"
-  disabled
->
-🔍 Start OCR
-</button>
-
-
-<button
-  id="chooseBtn"
->
-✕ Choose Another Image
-</button>
-
-
-<div id="progress">
-Please choose a prescription image.
-</div>
-
-
-<div id="errorBox"></div>
-
-</div>
-
-
-<!-- OCR RESULT -->
-
-<div class="section-title">
-📜 OCR Result
-</div>
-
-
-<textarea
-  id="result"
-  readonly
-  placeholder="OCR result will appear here..."
-></textarea>
-
-
-<button id="copyBtn">
-📋 Copy Text
-</button>
-
-
-<!-- MEDICINE MATCH -->
-
-<div id="medicineBox">
-
-<h2>
-💊 Medicine Detection
-</h2>
-
-<div id="medicineList"></div>
-
-</div>
-
-
-<!-- SAFETY -->
-
-<div class="note">
-
-⚠️ OCR ভুল medicine name বা dosage শনাক্ত করতে পারে।
-Detected medicine শুধুমাত্র সম্ভাব্য match হিসেবে দেখানো হবে।
-ওষুধ গ্রহণের আগে অবশ্যই registered doctor/pharmacist-এর
-prescription যাচাই করুন।
-
-</div>
-
-
-</div>
-
-
-<script>
-
-
-/* =====================================================
-   ELEMENTS
-===================================================== */
-
-const imageInput =
-document.getElementById("imageInput");
-
-const preview =
-document.getElementById("preview");
-
-const ocrBtn =
-document.getElementById("ocrBtn");
-
-const chooseBtn =
-document.getElementById("chooseBtn");
-
-const progress =
-document.getElementById("progress");
-
-const result =
-document.getElementById("result");
-
-const copyBtn =
-document.getElementById("copyBtn");
-
-const errorBox =
-document.getElementById("errorBox");
-
-const medicineBox =
-document.getElementById("medicineBox");
-
-const medicineList =
-document.getElementById("medicineList");
-
-
-let selectedImage = null;
-
-let worker = null;
-
-
-/* =====================================================
-   MEDICINE DATABASE
-===================================================== */
-
-const medicineDatabase = [
-
-"Famiclav 500 mg",
-"Dalatic 300 mg",
-"DDR 30 mg",
-"Fevedol",
-"Embacal DX",
-"Hyoron",
-"Constipin Powder",
-
-"Paracetamol",
-"Paracetamol 500 mg",
-"Paracetamol 650 mg",
-
-"Amoxicillin",
-"Azithromycin",
-"Cefixime",
-"Cefuroxime",
-"Ciprofloxacin",
-"Metronidazole",
-"Clindamycin",
-
-"Omeprazole",
-"Esomeprazole",
-"Pantoprazole",
-"Rabeprazole",
-
-"Domperidone",
-"Ondansetron",
-
-"Diclofenac",
-"Naproxen",
-"Ibuprofen",
-
-"Montelukast",
-"Cetirizine",
-"Levocetirizine",
-"Fexofenadine",
-
-"Losartan",
-"Amlodipine",
-"Bisoprolol",
-"Atorvastatin",
-
-"Metformin",
-"Gliclazide",
-
-"Calcium",
-"Vitamin D3",
-"Vitamin B12",
-"Ferrous Sulfate",
-
-"ORS",
-"Salbutamol",
-
-"Famotidine"
-
-];
-
-
-/* =====================================================
-   IMAGE SELECT
-===================================================== */
-
-imageInput.addEventListener(
-"change",
-function(event){
-
-const file =
-event.target.files[0];
-
-if(!file){
-return;
+.container {
+  width: 100%;
+  max-width: 650px;
+  margin: auto;
+  padding: 0 16px 50px;
 }
 
 
-if(!file.type.startsWith("image/")){
+/* ==================================================
+   HEADER
+================================================== */
 
-showError(
-"Please select a valid image."
-);
+.header {
+  background: #109b96;
+  color: white;
+  text-align: center;
+  padding: 30px 15px;
+  margin: 0 -16px 25px;
+  border-radius: 0 0 35px 35px;
+}
 
-return;
+.header h1 {
+  margin: 0;
+  font-size: 34px;
+}
 
+.header p {
+  margin: 8px 0 0;
+  font-size: 16px;
 }
 
 
-selectedImage =
-file;
+/* ==================================================
+   CARD
+================================================== */
 
-
-preview.src =
-URL.createObjectURL(file);
-
-preview.style.display =
-"block";
-
-
-ocrBtn.disabled =
-false;
-
-
-result.value =
-"";
-
-
-medicineBox.style.display =
-"none";
-
-medicineList.innerHTML =
-"";
-
-
-errorBox.style.display =
-"none";
-
-
-progress.textContent =
-"✅ Image ready. Press Start OCR.";
-
+.card {
+  background: white;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
 }
-);
 
-
-/* =====================================================
-   CHOOSE ANOTHER IMAGE
-===================================================== */
-
-chooseBtn.addEventListener(
-"click",
-function(){
-
-imageInput.value =
-"";
-
-selectedImage =
-null;
-
-
-preview.src =
-"";
-
-preview.style.display =
-"none";
-
-
-result.value =
-"";
-
-
-medicineList.innerHTML =
-"";
-
-
-medicineBox.style.display =
-"none";
-
-
-errorBox.style.display =
-"none";
-
-
-ocrBtn.disabled =
-true;
-
-
-progress.textContent =
-"Please choose a prescription image.";
-
+.title {
+  font-size: 25px;
+  font-weight: bold;
+  margin-bottom: 8px;
 }
-);
 
-
-/* =====================================================
-   ERROR
-===================================================== */
-
-function showError(message){
-
-errorBox.style.display =
-"block";
-
-errorBox.textContent =
-"❌ " + message;
-
+.description {
+  color: #687878;
+  line-height: 1.5;
+  margin-bottom: 20px;
 }
 
 
-/* =====================================================
-   IMAGE PREPROCESSING
-===================================================== */
-
-function preprocessImage(file){
-
-return new Promise(
-(resolve,reject)=>{
-
-const img =
-new Image();
-
-
-img.onload =
-function(){
-
-try{
-
-const canvas =
-document.createElement("canvas");
-
-const ctx =
-canvas.getContext("2d");
-
-
-let width =
-img.naturalWidth;
-
-let height =
-img.naturalHeight;
-
-
-/* Increase small images */
-
-if(width < 1600){
-
-const ratio =
-1600 / width;
-
-width =
-1600;
-
-height =
-Math.round(
-height * ratio
-);
-
-}
-
-
-/* Limit very large images */
-
-if(width > 2200){
-
-const ratio =
-2200 / width;
-
-width =
-2200;
-
-height =
-Math.round(
-height * ratio
-);
-
-}
-
-
-canvas.width =
-width;
-
-canvas.height =
-height;
-
-
-ctx.drawImage(
-img,
-0,
-0,
-width,
-height
-);
-
-
-/* Grayscale */
-
-const imageData =
-ctx.getImageData(
-0,
-0,
-width,
-height
-);
-
-const data =
-imageData.data;
-
-
-for(
-let i=0;
-i<data.length;
-i+=4
-){
-
-const r =
-data[i];
-
-const g =
-data[i+1];
-
-const b =
-data[i+2];
-
-
-let gray =
-0.299*r +
-0.587*g +
-0.114*b;
-
-
-/* Moderate contrast */
-
-gray =
-((gray-128)*1.25)+128;
-
-
-gray =
-Math.max(
-0,
-Math.min(
-255,
-gray
-)
-);
-
-
-data[i] =
-gray;
-
-data[i+1] =
-gray;
-
-data[i+2] =
-gray;
-
-}
-
-
-ctx.putImageData(
-imageData,
-0,
-0
-);
-
-
-resolve(
-canvas.toDataURL(
-"image/jpeg",
-0.95
-)
-);
-
-}
-
-catch(error){
-
-reject(error);
-
-}
-
-};
-
-
-img.onerror =
-function(){
-
-reject(
-new Error(
-"Could not load image."
-)
-);
-
-};
-
-
-img.src =
-URL.createObjectURL(file);
-
-});
-
-}
-
-
-/* =====================================================
-   START OCR
-===================================================== */
-
-ocrBtn.addEventListener(
-"click",
-async function(){
-
-if(!selectedImage){
-
-alert(
-"Please select a prescription image first."
-);
-
-return;
-
-}
-
-
-ocrBtn.disabled =
-true;
-
-result.value =
-"";
-
-errorBox.style.display =
-"none";
-
-medicineBox.style.display =
-"none";
-
-
-try{
-
-
-/* Check Tesseract */
-
-if(
-typeof Tesseract ===
-"undefined"
-){
-
-throw new Error(
-"Tesseract.js failed to load. Please check your internet connection."
-);
-
-}
-
-
-/* Preprocess */
-
-progress.textContent =
-"⏳ Preparing prescription image...";
-
-
-const processedImage =
-await preprocessImage(
-selectedImage
-);
-
-
-/* Load OCR */
-
-progress.textContent =
-"⏳ Loading OCR engine...";
-
+/* ==================================================
+   FILE PICKER
+================================================== */
 
 /*
 IMPORTANT:
-
-corePath is a DIRECTORY.
-We do NOT force the SIMD file.
+There is NO capture="environment".
+Therefore the phone will NOT automatically open camera.
 */
 
-worker =
-await Tesseract.createWorker(
-"eng",
-1,
-{
+#imageInput {
+  display: none;
+}
 
-corePath:
-"https://unpkg.com/tesseract.js-core@5.0.5/",
-
-workerPath:
-"https://unpkg.com/tesseract.js@5.0.5/dist/worker.min.js",
-
-langPath:
-"https://tessdata.projectnaptha.com/4.0.0",
-
-logger:
-function(info){
-
-if(
-info &&
-info.status
-){
-
-let percent =
-"";
-
-
-if(
-typeof info.progress ===
-"number"
-){
-
-percent =
-" " +
-Math.round(
-info.progress*100
-) +
-"%";
-
+.upload-button {
+  display: block;
+  width: 100%;
+  padding: 18px;
+  background: #109b96;
+  color: white;
+  border-radius: 18px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 
-progress.textContent =
-"🔍 " +
-info.status +
-percent;
+/* ==================================================
+   IMAGE PREVIEW
+================================================== */
 
-}
-
-}
-
-}
-);
-
-
-/* OCR settings */
-
-try{
-
-await worker.setParameters({
-
-preserve_interword_spaces:
-"1",
-
-tessedit_pageseg_mode:
-"6"
-
-});
-
-}
-catch(e){
-
-console.log(
-"Optional parameters skipped.",
-e
-);
-
+#preview {
+  display: none;
+  width: 100%;
+  max-height: 550px;
+  object-fit: contain;
+  margin-top: 15px;
+  border-radius: 18px;
+  background: #f2f2f2;
 }
 
 
-/* Recognize */
+/* ==================================================
+   BUTTONS
+================================================== */
 
-progress.textContent =
-"🔍 Reading prescription...";
+button {
+  width: 100%;
+  border: none;
+  border-radius: 20px;
+  padding: 18px;
+  margin-top: 14px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
 
+#ocrButton {
+  background: #109b96;
+  color: white;
+}
 
-const response =
-await worker.recognize(
-processedImage
-);
+#ocrButton:disabled {
+  background: #9dbfbd;
+  cursor: not-allowed;
+}
 
+#resetButton {
+  background: #e5f4f5;
+  color: #087f7b;
+}
 
-let text =
-"";
-
-
-if(
-response &&
-response.data &&
-response.data.text
-){
-
-text =
-response.data.text
-.replace(
-/\r/g,
-""
-)
-.replace(
-/\n{3,}/g,
-"\n\n"
-)
-.trim();
-
+#copyButton {
+  background: #e5f4f5;
+  color: #087f7b;
 }
 
 
-/* Result */
-
-if(text){
-
-result.value =
-text;
-
-
-progress.textContent =
-"✅ OCR completed successfully.";
-
-
-findMedicines(text);
-
-}
-
-else{
-
-result.value =
-"No readable text detected.\n\n" +
-"Please try a clearer prescription image.";
-
-progress.textContent =
-"⚠️ No readable text found.";
-
-}
-
-}
-catch(error){
-
-console.error(
-"MedAssist OCR Error:",
-error
-);
-
-
-const message =
-error &&
-error.message
-? error.message
-: String(error);
-
-
-result.value =
-"OCR failed.\n\n" +
-message;
-
-
-progress.textContent =
-"❌ OCR failed.";
-
-
-showError(
-message
-);
-
-}
-finally{
-
-
-if(worker){
-
-try{
-
-await worker.terminate();
-
-}
-catch(e){
-
-console.log(
-"Worker termination:",
-e
-);
-
-}
-
-worker =
-null;
-
-}
-
-
-ocrBtn.disabled =
-false;
-
-}
-
-}
-);
-
-
-/* =====================================================
-   NORMALIZE TEXT
-===================================================== */
-
-function normalizeText(text){
-
-return text
-.toLowerCase()
-.replace(
-/[^a-z0-9]+/g,
-""
-);
-
-}
-
-
-/* =====================================================
-   LEVENSHTEIN DISTANCE
-===================================================== */
-
-function levenshtein(a,b){
-
-const matrix = [];
-
-
-for(
-let i=0;
-i<=b.length;
-i++
-){
-
-matrix[i] = [i];
-
-}
-
-
-for(
-let j=0;
-j<=a.length;
-j++
-){
-
-matrix[0][j] = j;
-
-}
-
-
-for(
-let i=1;
-i<=b.length;
-i++
-){
-
-for(
-let j=1;
-j<=a.length;
-j++
-){
-
-if(
-b.charAt(i-1) ===
-a.charAt(j-1)
-){
-
-matrix[i][j] =
-matrix[i-1][j-1];
-
-}
-else{
-
-matrix[i][j] =
-Math.min(
-
-matrix[i-1][j-1]+1,
-
-matrix[i][j-1]+1,
-
-matrix[i-1][j]+1
-
-);
-
-}
-
-}
-
-}
-
-
-return matrix[b.length][a.length];
-
-}
-
-
-/* =====================================================
-   SIMILARITY
-===================================================== */
-
-function similarity
+/* ==================================================
+   STATUS
+================================================== */
+
+#status {
+  margin-top: 15px;
+  padding: 15px;
+  background: #e5f4f5;
+  color: #087f7b;
+  border-radius: 14px;
+  text-align: center;
+  font-weight: bold;
+  min-height: 50px;
+  line-height: 1.
