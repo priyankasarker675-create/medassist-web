@@ -13,9 +13,7 @@
   <title>MedAssist - Prescription OCR</title>
 
   <!-- Tesseract.js -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js">
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js"></script>
 
   <style>
 
@@ -37,36 +35,51 @@
       padding: 20px 16px 40px;
     }
 
-    h1 {
+    .header {
+      background: #109b96;
+      color: white;
       text-align: center;
-      margin: 10px 0 8px;
-      color: #087f7b;
-      font-size: 30px;
+      padding: 28px 15px;
+      border-radius: 0 0 35px 35px;
+      margin: -20px -16px 30px;
     }
 
-    .subtitle {
-      text-align: center;
-      color: #667;
-      margin-bottom: 25px;
+    .header h1 {
+      margin: 0;
+      font-size: 34px;
     }
 
-    .image-box {
+    .header p {
+      margin: 8px 0 0;
+      font-size: 17px;
+    }
+
+    .card {
       background: white;
       border-radius: 24px;
-      padding: 12px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+      padding: 20px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
     }
 
-    #preview {
-      width: 100%;
-      max-height: 500px;
-      object-fit: contain;
-      border-radius: 18px;
+    .card-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .card-description {
+      color: #667;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    #imageInput {
       display: none;
     }
 
-    .upload-label {
+    .upload-button {
       display: block;
+      width: 100%;
       background: #109b96;
       color: white;
       padding: 18px;
@@ -77,7 +90,12 @@
       cursor: pointer;
     }
 
-    #imageInput {
+    #preview {
+      width: 100%;
+      max-height: 550px;
+      object-fit: contain;
+      margin-top: 15px;
+      border-radius: 18px;
       display: none;
     }
 
@@ -107,20 +125,32 @@
       color: #087f7b;
     }
 
-    .progress-box {
+    .progress {
       margin-top: 15px;
-      padding: 12px;
-      border-radius: 12px;
       background: #e7f5f6;
       color: #087f7b;
+      padding: 14px;
+      border-radius: 14px;
       text-align: center;
       font-weight: bold;
-      min-height: 45px;
+      min-height: 48px;
     }
 
-    .result-title {
+    .error {
+      display: none;
+      margin-top: 15px;
+      background: #fff0f0;
+      border: 1px solid #ffcccc;
+      color: #a00000;
+      padding: 15px;
+      border-radius: 14px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .section-title {
       margin-top: 28px;
-      font-size: 23px;
+      font-size: 24px;
       font-weight: bold;
     }
 
@@ -132,10 +162,10 @@
       border: 1px solid #ddd;
       border-radius: 18px;
       background: white;
+      font-family: Arial, sans-serif;
       font-size: 17px;
       line-height: 1.7;
       resize: vertical;
-      font-family: Arial, sans-serif;
     }
 
     #copyBtn {
@@ -149,12 +179,12 @@
       background: white;
       border-radius: 18px;
       padding: 18px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
     }
 
     .medicine-box h3 {
-      margin-top: 0;
       color: #087f7b;
+      margin-top: 0;
     }
 
     .medicine {
@@ -163,26 +193,13 @@
       font-weight: bold;
     }
 
-    .error-box {
-      display: none;
-      margin-top: 15px;
-      padding: 15px;
-      background: #fff0f0;
-      border: 1px solid #ffcccc;
-      border-radius: 12px;
-      color: #a00000;
-      font-size: 14px;
-      line-height: 1.5;
-      word-break: break-word;
-    }
-
     .note {
       margin-top: 20px;
-      padding: 12px;
+      padding: 14px;
       background: #fff8e1;
-      border-radius: 12px;
-      font-size: 13px;
+      border-radius: 14px;
       color: #665500;
+      font-size: 13px;
       line-height: 1.5;
     }
 
@@ -196,23 +213,42 @@
 
 <div class="container">
 
-  <h1>💊 MedAssist</h1>
 
-  <div class="subtitle">
-    Your Smart Medicine Assistant
+  <!-- HEADER -->
+
+  <div class="header">
+
+    <h1>
+      💊 MedAssist
+    </h1>
+
+    <p>
+      Your Smart Medicine Assistant
+    </p>
+
   </div>
 
 
-  <!-- IMAGE AREA -->
+  <!-- UPLOAD CARD -->
 
-  <div class="image-box">
+  <div class="card">
+
+    <div class="card-title">
+      📝 Prescription OCR
+    </div>
+
+    <div class="card-description">
+      Select a prescription image from your phone gallery.
+    </div>
+
 
     <label
-      class="upload-label"
+      class="upload-button"
       for="imageInput"
     >
       📷 Choose Prescription Image
     </label>
+
 
     <input
       type="file"
@@ -220,55 +256,49 @@
       accept="image/*"
     >
 
+
     <img
       id="preview"
       alt="Prescription Preview"
     >
 
+
+    <button
+      id="ocrBtn"
+      disabled
+    >
+      🔍 Start OCR
+    </button>
+
+
+    <button
+      id="chooseBtn"
+    >
+      ✕ Choose Another Image
+    </button>
+
+
+    <div
+      id="progress"
+      class="progress"
+    >
+      Please choose a prescription image.
+    </div>
+
+
+    <div
+      id="errorBox"
+      class="error"
+    ></div>
+
+
   </div>
 
 
-  <!-- OCR BUTTON -->
+  <!-- OCR RESULT -->
 
-  <button
-    id="ocrBtn"
-    disabled
-  >
-    🔍 Start OCR
-  </button>
-
-
-  <!-- CHOOSE ANOTHER -->
-
-  <button
-    id="chooseBtn"
-  >
-    ✕ Choose Another Image
-  </button>
-
-
-  <!-- PROGRESS -->
-
-  <div
-    id="progress"
-    class="progress-box"
-  >
-    Please choose a prescription image.
-  </div>
-
-
-  <!-- ERROR -->
-
-  <div
-    id="errorBox"
-    class="error-box"
-  ></div>
-
-
-  <!-- RESULT -->
-
-  <div class="result-title">
-    📝 OCR Result
+  <div class="section-title">
+    📜 OCR Result
   </div>
 
 
@@ -279,8 +309,6 @@
   ></textarea>
 
 
-  <!-- COPY -->
-
   <button
     id="copyBtn"
   >
@@ -288,32 +316,35 @@
   </button>
 
 
-  <!-- MEDICINES -->
+  <!-- MEDICINE DETECTION -->
 
   <div
-    class="medicine-box"
     id="medicineBox"
+    class="medicine-box"
   >
 
     <h3>
       💊 Detected Medicines
     </h3>
 
-    <div id="medicineList"></div>
+    <div
+      id="medicineList"
+    ></div>
 
   </div>
 
 
-  <!-- WARNING -->
+  <!-- SAFETY NOTE -->
 
   <div class="note">
 
-    ⚠️ OCR শুধু prescription-এর লেখা শনাক্ত করার জন্য।
-    OCR ভুল medicine name বা dosage শনাক্ত করতে পারে।
-    কোনো ওষুধ গ্রহণের আগে অবশ্যই doctor/pharmacist-এর
-    prescription যাচাই করুন।
+    ⚠️ OCR শুধুমাত্র prescription-এর লেখা শনাক্ত করার
+    জন্য ব্যবহার করুন। OCR ভুল medicine name বা dosage
+    শনাক্ত করতে পারে। ওষুধ গ্রহণের আগে অবশ্যই doctor বা
+    registered pharmacist-এর prescription যাচাই করুন।
 
   </div>
+
 
 </div>
 
@@ -338,14 +369,17 @@ const ocrBtn =
 const chooseBtn =
   document.getElementById("chooseBtn");
 
-const result =
-  document.getElementById("result");
-
 const progress =
   document.getElementById("progress");
 
+const result =
+  document.getElementById("result");
+
 const copyBtn =
   document.getElementById("copyBtn");
+
+const errorBox =
+  document.getElementById("errorBox");
 
 const medicineBox =
   document.getElementById("medicineBox");
@@ -353,16 +387,13 @@ const medicineBox =
 const medicineList =
   document.getElementById("medicineList");
 
-const errorBox =
-  document.getElementById("errorBox");
-
 
 let selectedImage = null;
 
 
 
 /* =====================================================
-   IMAGE SELECT
+   SELECT IMAGE
 ===================================================== */
 
 imageInput.addEventListener(
@@ -377,49 +408,51 @@ imageInput.addEventListener(
     }
 
 
-    /* Check image */
-
     if (!file.type.startsWith("image/")) {
 
       showError(
-        "Please select a valid image file."
+        "Please select a valid image."
       );
 
       return;
+
     }
 
 
-    selectedImage = file;
+    selectedImage =
+      file;
 
-
-    /* Preview */
 
     const imageURL =
       URL.createObjectURL(file);
 
-    preview.src = imageURL;
+
+    preview.src =
+      imageURL;
+
 
     preview.style.display =
       "block";
 
 
-    /* Enable OCR */
-
     ocrBtn.disabled =
       false;
 
 
-    /* Clear old result */
+    result.value =
+      "";
 
-    result.value = "";
 
-    medicineList.innerHTML = "";
+    errorBox.style.display =
+      "none";
+
 
     medicineBox.style.display =
       "none";
 
-    errorBox.style.display =
-      "none";
+
+    medicineList.innerHTML =
+      "";
 
 
     progress.textContent =
@@ -438,27 +471,39 @@ chooseBtn.addEventListener(
   "click",
   function() {
 
-    imageInput.value = "";
+    imageInput.value =
+      "";
 
-    selectedImage = null;
+    selectedImage =
+      null;
 
-    preview.src = "";
+
+    preview.src =
+      "";
 
     preview.style.display =
       "none";
 
-    result.value = "";
 
-    medicineList.innerHTML = "";
+    result.value =
+      "";
+
+
+    medicineList.innerHTML =
+      "";
+
 
     medicineBox.style.display =
       "none";
 
+
     errorBox.style.display =
       "none";
 
+
     ocrBtn.disabled =
       true;
+
 
     progress.textContent =
       "Please choose a prescription image.";
@@ -469,7 +514,7 @@ chooseBtn.addEventListener(
 
 
 /* =====================================================
-   ERROR
+   SHOW ERROR
 ===================================================== */
 
 function showError(message) {
@@ -521,19 +566,44 @@ function preprocessImage(file) {
 
 
             /*
-              Keep image reasonably large.
+              Upscale small images.
             */
 
-            const maxWidth = 2000;
+            const minimumWidth =
+              1600;
 
 
-            if (width > maxWidth) {
+            if (width < minimumWidth) {
 
               const ratio =
-                maxWidth / width;
+                minimumWidth / width;
 
               width =
-                maxWidth;
+                minimumWidth;
+
+              height =
+                Math.round(
+                  height * ratio
+                );
+
+            }
+
+
+            /*
+              Limit huge images.
+            */
+
+            const maximumWidth =
+              2200;
+
+
+            if (width > maximumWidth) {
+
+              const ratio =
+                maximumWidth / width;
+
+              width =
+                maximumWidth;
 
               height =
                 Math.round(
@@ -550,10 +620,6 @@ function preprocessImage(file) {
               height;
 
 
-            /*
-              Draw image
-            */
-
             ctx.drawImage(
               img,
               0,
@@ -564,7 +630,7 @@ function preprocessImage(file) {
 
 
             /*
-              Get pixels
+              Convert to grayscale.
             */
 
             const imageData =
@@ -579,10 +645,6 @@ function preprocessImage(file) {
             const data =
               imageData.data;
 
-
-            /*
-              Grayscale + contrast
-            */
 
             for (
               let i = 0;
@@ -601,17 +663,17 @@ function preprocessImage(file) {
 
 
               let gray =
-                (0.299 * r) +
-                (0.587 * g) +
-                (0.114 * b);
+                0.299 * r +
+                0.587 * g +
+                0.114 * b;
 
 
               /*
-                Contrast
+                Moderate contrast.
               */
 
               gray =
-                ((gray - 128) * 1.25) +
+                ((gray - 128) * 1.2) +
                 128;
 
 
@@ -644,10 +706,6 @@ function preprocessImage(file) {
             );
 
 
-            /*
-              Return processed image
-            */
-
             resolve(
               canvas.toDataURL(
                 "image/jpeg",
@@ -671,7 +729,7 @@ function preprocessImage(file) {
 
           reject(
             new Error(
-              "Could not load selected image."
+              "Unable to load the selected image."
             )
           );
 
@@ -704,12 +762,9 @@ ocrBtn.addEventListener(
       );
 
       return;
+
     }
 
-
-    /*
-      Disable button
-    */
 
     ocrBtn.disabled =
       true;
@@ -727,16 +782,20 @@ ocrBtn.addEventListener(
       "none";
 
 
-    medicineList.innerHTML =
-      "";
+    progress.textContent =
+      "⏳ Preparing image...";
+
+
+    let worker =
+      null;
 
 
     try {
 
 
-      /* -----------------------------------------
+      /* ---------------------------------------------
          CHECK TESSERACT
-      ----------------------------------------- */
+      --------------------------------------------- */
 
       if (
         typeof Tesseract ===
@@ -744,19 +803,15 @@ ocrBtn.addEventListener(
       ) {
 
         throw new Error(
-          "Tesseract.js could not be loaded. Please check your internet connection."
+          "Tesseract.js did not load. Check your internet connection."
         );
 
       }
 
 
-      /* -----------------------------------------
+      /* ---------------------------------------------
          PREPROCESS
-      ----------------------------------------- */
-
-      progress.textContent =
-        "⏳ Preparing prescription image...";
-
+      --------------------------------------------- */
 
       const processedImage =
         await preprocessImage(
@@ -764,15 +819,20 @@ ocrBtn.addEventListener(
         );
 
 
-      /* -----------------------------------------
-         CREATE WORKER
-      ----------------------------------------- */
-
       progress.textContent =
         "🔄 Loading OCR engine...";
 
 
-      const worker =
+      /* ---------------------------------------------
+         CREATE WORKER
+         
+         IMPORTANT:
+         We deliberately use NON-SIMD core.
+         This avoids the SIMD WASM loading problem
+         shown in your screenshot.
+      --------------------------------------------- */
+
+      worker =
         await Tesseract.createWorker(
           "eng",
           1,
@@ -784,8 +844,12 @@ ocrBtn.addEventListener(
             langPath:
               "https://tessdata.projectnaptha.com/4.0.0",
 
+            /*
+              Force compatible non-SIMD core.
+            */
+
             corePath:
-              "https://cdn.jsdelivr.net/npm/tesseract.js-core@5.0.5",
+              "https://cdn.jsdelivr.net/npm/tesseract.js-core@5.0.5/tesseract-core.wasm.js",
 
             logger:
               function(info) {
@@ -827,16 +891,19 @@ ocrBtn.addEventListener(
         );
 
 
-      /* -----------------------------------------
-         OCR PARAMETERS
-      ----------------------------------------- */
+      /* ---------------------------------------------
+         PARAMETERS
+      --------------------------------------------- */
 
       try {
 
         await worker.setParameters({
 
           preserve_interword_spaces:
-            "1"
+            "1",
+
+          tessedit_pageseg_mode:
+            "6"
 
         });
 
@@ -845,16 +912,16 @@ ocrBtn.addEventListener(
       catch(parameterError) {
 
         console.log(
-          "Parameter setting skipped:",
+          "Optional OCR parameters skipped.",
           parameterError
         );
 
       }
 
 
-      /* -----------------------------------------
+      /* ---------------------------------------------
          RECOGNIZE
-      ----------------------------------------- */
+      --------------------------------------------- */
 
       progress.textContent =
         "🔍 Reading prescription...";
@@ -866,9 +933,9 @@ ocrBtn.addEventListener(
         );
 
 
-      /* -----------------------------------------
+      /* ---------------------------------------------
          GET TEXT
-      ----------------------------------------- */
+      --------------------------------------------- */
 
       let text =
         "";
@@ -895,11 +962,13 @@ ocrBtn.addEventListener(
       }
 
 
-      /* -----------------------------------------
-         RESULT
-      ----------------------------------------- */
+      /* ---------------------------------------------
+         SHOW RESULT
+      --------------------------------------------- */
 
-      if (text.length > 0) {
+      if (
+        text.length > 0
+      ) {
 
         result.value =
           text;
@@ -919,34 +988,27 @@ ocrBtn.addEventListener(
 
         result.value =
           "No readable text was detected.\n\n" +
-          "Please try a clearer or higher-quality prescription image.";
+          "Please try a clearer prescription image.";
 
 
         progress.textContent =
-          "⚠️ No readable text found.";
+          "⚠️ No readable text detected.";
 
       }
 
 
-      /* -----------------------------------------
-         TERMINATE WORKER
-      ----------------------------------------- */
-
-      await worker.terminate();
-
     }
-
 
     catch(error) {
 
 
       console.error(
-        "OCR ERROR:",
+        "MEDASSIST OCR ERROR:",
         error
       );
 
 
-      const message =
+      const errorMessage =
         error &&
         error.message
           ? error.message
@@ -955,7 +1017,7 @@ ocrBtn.addEventListener(
 
       result.value =
         "OCR failed.\n\n" +
-        message;
+        errorMessage;
 
 
       progress.textContent =
@@ -963,13 +1025,38 @@ ocrBtn.addEventListener(
 
 
       showError(
-        message
+        errorMessage
       );
 
     }
 
 
     finally {
+
+
+      /* ---------------------------------------------
+         TERMINATE WORKER
+      --------------------------------------------- */
+
+      if (worker) {
+
+        try {
+
+          await worker.terminate();
+
+        }
+
+        catch(terminateError) {
+
+          console.log(
+            "Worker termination error:",
+            terminateError
+          );
+
+        }
+
+      }
+
 
       ocrBtn.disabled =
         false;
@@ -1040,7 +1127,7 @@ function detectMedicines(text) {
   ];
 
 
-  const possibleMedicines =
+  const medicines =
     [];
 
 
@@ -1051,7 +1138,7 @@ function detectMedicines(text) {
         line.toLowerCase();
 
 
-      const looksLikeMedicine =
+      const isMedicine =
         medicineWords.some(
           function(word) {
 
@@ -1063,11 +1150,9 @@ function detectMedicines(text) {
         );
 
 
-      if (
-        looksLikeMedicine
-      ) {
+      if (isMedicine) {
 
-        possibleMedicines.push(
+        medicines.push(
           line
         );
 
@@ -1077,20 +1162,16 @@ function detectMedicines(text) {
   );
 
 
-  /*
-    Remove duplicates
-  */
-
-  const uniqueMedicines =
+  const unique =
     [
       ...new Set(
-        possibleMedicines
+        medicines
       )
     ];
 
 
   if (
-    uniqueMedicines.length ===
+    unique.length ===
     0
   ) {
 
@@ -1103,25 +1184,26 @@ function detectMedicines(text) {
     "block";
 
 
-  uniqueMedicines.forEach(
-    function(item) {
+  unique.forEach(
+    function(medicine) {
 
-      const div =
+      const item =
         document.createElement(
           "div"
         );
 
 
-      div.className =
+      item.className =
         "medicine";
 
 
-      div.textContent =
-        "💊 " + item;
+      item.textContent =
+        "💊 " +
+        medicine;
 
 
       medicineList.appendChild(
-        div
+        item
       );
 
     }
@@ -1157,11 +1239,6 @@ copyBtn.addEventListener(
 
     try {
 
-
-      /*
-        Modern clipboard
-      */
-
       await navigator.clipboard.writeText(
         text
       );
@@ -1170,32 +1247,14 @@ copyBtn.addEventListener(
       copyBtn.textContent =
         "✅ Copied!";
 
-
     }
 
     catch(error) {
 
-
-      /*
-        Fallback
-      */
-
-      result.removeAttribute(
-        "readonly"
-      );
-
-
       result.select();
-
 
       document.execCommand(
         "copy"
-      );
-
-
-      result.setAttribute(
-        "readonly",
-        "readonly"
       );
 
 
