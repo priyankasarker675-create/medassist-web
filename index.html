@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>MedAssist</title>
+    <title>MedAssist - Smart Medicine Assistant</title>
+
+    <!-- Tesseract.js OCR Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
     <style>
         * {
@@ -97,6 +100,11 @@
             margin-top: 10px;
         }
 
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         input[type="file"] {
             display: none;
         }
@@ -108,10 +116,11 @@
 
         #previewImage {
             width: 100%;
-            max-height: 350px;
+            max-height: 400px;
             object-fit: contain;
             border-radius: 14px;
             border: 1px solid #e5e7eb;
+            background: #f8fafc;
         }
 
         #ocrSection {
@@ -121,13 +130,14 @@
 
         #ocrResult {
             width: 100%;
-            min-height: 180px;
+            min-height: 220px;
             padding: 14px;
             border: 1px solid #d1d5db;
             border-radius: 12px;
             resize: vertical;
             font-size: 15px;
-            line-height: 1.5;
+            line-height: 1.6;
+            font-family: Arial, sans-serif;
         }
 
         .status {
@@ -141,11 +151,48 @@
             font-size: 14px;
         }
 
+        .progress {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .progressBar {
+            height: 100%;
+            width: 0%;
+            background: #0b8f87;
+            transition: width 0.3s ease;
+        }
+
         .footer {
             text-align: center;
             color: #9ca3af;
             font-size: 12px;
             padding: 20px;
+        }
+
+        .note {
+            background: #fff8e1;
+            color: #795548;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-top: 12px;
+        }
+
+        .success {
+            background: #e8f7ef;
+            color: #176b3a;
+        }
+
+        .error {
+            background: #fff0f0;
+            color: #a12626;
         }
     </style>
 </head>
@@ -157,17 +204,21 @@
     <p>Your Smart Medicine Assistant</p>
 </header>
 
+
 <main class="container">
 
     <section class="welcome">
         <h2>Welcome to MedAssist</h2>
+
         <p>
             Understand your prescription and medicine information more easily.
         </p>
     </section>
 
 
-    <!-- Gallery OCR -->
+    <!-- ========================= -->
+    <!-- PRESCRIPTION OCR -->
+    <!-- ========================= -->
 
     <div class="card">
 
@@ -179,6 +230,7 @@
             Select a prescription image from your phone gallery.
         </p>
 
+
         <input
             type="file"
             id="galleryInput"
@@ -186,10 +238,13 @@
             onchange="imageSelected(event)"
         >
 
+
         <button onclick="openGallery()">
-            Choose Prescription Image
+            📷 Choose Prescription Image
         </button>
 
+
+        <!-- IMAGE PREVIEW -->
 
         <div id="previewContainer">
 
@@ -202,12 +257,15 @@
                 alt="Prescription preview"
             >
 
+
             <button
+                id="ocrButton"
                 onclick="startOCR()"
                 style="margin-top: 12px;"
             >
                 🔍 Start OCR
             </button>
+
 
             <button
                 class="secondary"
@@ -219,264 +277,10 @@
         </div>
 
 
+        <!-- OCR STATUS -->
+
         <div id="ocrStatus" class="status">
-            Processing prescription...
-        </div>
 
+            Preparing OCR...
 
-        <div id="ocrSection">
-
-            <h3 style="margin: 18px 0 10px;">
-                📝 OCR Result
-            </h3>
-
-            <textarea
-                id="ocrResult"
-                placeholder="OCR text will appear here..."
-            ></textarea>
-
-            <button
-                class="secondary"
-                onclick="copyOCR()"
-            >
-                📋 Copy Text
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- Medicine Search -->
-
-    <div class="card">
-
-        <div class="icon">🔎</div>
-
-        <h3>Search Medicine</h3>
-
-        <p>
-            Search for medicine information.
-        </p>
-
-        <input
-            type="text"
-            id="medicineInput"
-            placeholder="Enter medicine name"
-            style="
-                width:100%;
-                padding:14px;
-                border:1px solid #d1d5db;
-                border-radius:12px;
-                font-size:15px;
-                margin-bottom:10px;
-            "
-        >
-
-        <button onclick="searchMedicine()">
-            Search Medicine
-        </button>
-
-    </div>
-
-
-    <!-- AI Assistant -->
-
-    <div class="card">
-
-        <div class="icon">🤖</div>
-
-        <h3>AI Medicine Assistant</h3>
-
-        <p>
-            Ask questions about medicines and prescriptions.
-        </p>
-
-        <button onclick="openAssistant()">
-            Ask AI Assistant
-        </button>
-
-    </div>
-
-</main>
-
-
-<footer class="footer">
-    © 2026 MedAssist
-</footer>
-
-
-<script>
-
-    let selectedImage = null;
-
-
-    function openGallery() {
-
-        document
-            .getElementById("galleryInput")
-            .click();
-
-    }
-
-
-    function imageSelected(event) {
-
-        const file = event.target.files[0];
-
-        if (!file) {
-            return;
-        }
-
-        selectedImage = file;
-
-        const imageURL = URL.createObjectURL(file);
-
-        const preview =
-            document.getElementById("previewImage");
-
-        preview.src = imageURL;
-
-        document
-            .getElementById("previewContainer")
-            .style.display = "block";
-
-        document
-            .getElementById("ocrSection")
-            .style.display = "none";
-
-    }
-
-
-    function startOCR() {
-
-        if (!selectedImage) {
-
-            alert(
-                "Please select a prescription image first."
-            );
-
-            return;
-        }
-
-
-        const status =
-            document.getElementById("ocrStatus");
-
-        status.style.display = "block";
-
-        status.innerText =
-            "OCR engine will be connected in the next step...";
-
-
-        setTimeout(function () {
-
-            document
-                .getElementById("ocrSection")
-                .style.display = "block";
-
-            document
-                .getElementById("ocrResult")
-                .value =
-                "OCR is ready for integration.\n\n" +
-                "The real prescription text extraction " +
-                "will be connected next.";
-
-            status.style.display = "none";
-
-        }, 1000);
-
-    }
-
-
-    function clearImage() {
-
-        selectedImage = null;
-
-        document
-            .getElementById("galleryInput")
-            .value = "";
-
-        document
-            .getElementById("previewContainer")
-            .style.display = "none";
-
-        document
-            .getElementById("ocrSection")
-            .style.display = "none";
-
-        document
-            .getElementById("ocrStatus")
-            .style.display = "none";
-
-    }
-
-
-    function copyOCR() {
-
-        const text =
-            document
-            .getElementById("ocrResult")
-            .value;
-
-        if (!text) {
-
-            alert("There is no text to copy.");
-
-            return;
-        }
-
-        navigator.clipboard
-            .writeText(text)
-            .then(function () {
-
-                alert("OCR text copied.");
-
-            })
-            .catch(function () {
-
-                alert(
-                    "Unable to copy automatically."
-                );
-
-            });
-
-    }
-
-
-    function searchMedicine() {
-
-        const medicine =
-            document
-            .getElementById("medicineInput")
-            .value
-            .trim();
-
-        if (!medicine) {
-
-            alert(
-                "Please enter a medicine name."
-            );
-
-            return;
-        }
-
-        alert(
-            "Medicine search will be connected next."
-        );
-
-    }
-
-
-    function openAssistant() {
-
-        alert(
-            "AI Assistant will be connected after the backend is ready."
-        );
-
-    }
-
-</script>
-
-</body>
-</html>
+            <
