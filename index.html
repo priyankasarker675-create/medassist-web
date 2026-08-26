@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>MedAssist - Prescription OCR</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <!-- Tesseract.js -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js">
+  </script>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -21,6 +31,7 @@
     }
 
     .container {
+      width: 100%;
       max-width: 600px;
       margin: auto;
       padding: 20px 16px 40px;
@@ -28,15 +39,22 @@
 
     h1 {
       text-align: center;
-      margin: 10px 0 20px;
+      margin: 10px 0 8px;
       color: #087f7b;
+      font-size: 30px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #667;
+      margin-bottom: 25px;
     }
 
     .image-box {
       background: white;
       border-radius: 24px;
       padding: 12px;
-      box-shadow: 0 4px 18px rgba(0,0,0,.08);
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
     }
 
     #preview {
@@ -49,8 +67,8 @@
 
     .upload-label {
       display: block;
-      background: #e7f5f6;
-      color: #087f7b;
+      background: #109b96;
+      color: white;
       padding: 18px;
       border-radius: 18px;
       text-align: center;
@@ -80,7 +98,7 @@
     }
 
     #ocrBtn:disabled {
-      background: #8abfbd;
+      background: #9bbfbd;
       cursor: not-allowed;
     }
 
@@ -89,15 +107,26 @@
       color: #087f7b;
     }
 
+    .progress-box {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 12px;
+      background: #e7f5f6;
+      color: #087f7b;
+      text-align: center;
+      font-weight: bold;
+      min-height: 45px;
+    }
+
     .result-title {
       margin-top: 28px;
-      font-size: 24px;
+      font-size: 23px;
       font-weight: bold;
     }
 
     #result {
       width: 100%;
-      min-height: 220px;
+      min-height: 240px;
       margin-top: 12px;
       padding: 18px;
       border: 1px solid #ddd;
@@ -106,15 +135,7 @@
       font-size: 17px;
       line-height: 1.7;
       resize: vertical;
-      white-space: pre-wrap;
-    }
-
-    #progress {
-      margin-top: 12px;
-      text-align: center;
-      color: #087f7b;
-      font-weight: bold;
-      min-height: 24px;
+      font-family: Arial, sans-serif;
     }
 
     #copyBtn {
@@ -128,7 +149,7 @@
       background: white;
       border-radius: 18px;
       padding: 18px;
-      box-shadow: 0 3px 12px rgba(0,0,0,.06);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
     }
 
     .medicine-box h3 {
@@ -137,9 +158,22 @@
     }
 
     .medicine {
-      padding: 10px 0;
+      padding: 12px 0;
       border-bottom: 1px solid #eee;
       font-weight: bold;
+    }
+
+    .error-box {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      background: #fff0f0;
+      border: 1px solid #ffcccc;
+      border-radius: 12px;
+      color: #a00000;
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: break-word;
     }
 
     .note {
@@ -149,19 +183,34 @@
       border-radius: 12px;
       font-size: 13px;
       color: #665500;
+      line-height: 1.5;
     }
+
   </style>
+
 </head>
 
+
 <body>
+
 
 <div class="container">
 
   <h1>💊 MedAssist</h1>
 
+  <div class="subtitle">
+    Your Smart Medicine Assistant
+  </div>
+
+
+  <!-- IMAGE AREA -->
+
   <div class="image-box">
 
-    <label class="upload-label" for="imageInput">
+    <label
+      class="upload-label"
+      for="imageInput"
+    >
       📷 Choose Prescription Image
     </label>
 
@@ -171,23 +220,57 @@
       accept="image/*"
     >
 
-    <img id="preview" alt="Prescription Preview">
+    <img
+      id="preview"
+      alt="Prescription Preview"
+    >
 
   </div>
 
-  <button id="ocrBtn" disabled>
+
+  <!-- OCR BUTTON -->
+
+  <button
+    id="ocrBtn"
+    disabled
+  >
     🔍 Start OCR
   </button>
 
-  <button id="chooseBtn">
+
+  <!-- CHOOSE ANOTHER -->
+
+  <button
+    id="chooseBtn"
+  >
     ✕ Choose Another Image
   </button>
 
-  <div id="progress"></div>
+
+  <!-- PROGRESS -->
+
+  <div
+    id="progress"
+    class="progress-box"
+  >
+    Please choose a prescription image.
+  </div>
+
+
+  <!-- ERROR -->
+
+  <div
+    id="errorBox"
+    class="error-box"
+  ></div>
+
+
+  <!-- RESULT -->
 
   <div class="result-title">
     📝 OCR Result
   </div>
+
 
   <textarea
     id="result"
@@ -195,416 +278,950 @@
     readonly
   ></textarea>
 
-  <button id="copyBtn">
+
+  <!-- COPY -->
+
+  <button
+    id="copyBtn"
+  >
     📋 Copy Text
   </button>
 
-  <div class="medicine-box" id="medicineBox">
-    <h3>💊 Detected Medicines</h3>
+
+  <!-- MEDICINES -->
+
+  <div
+    class="medicine-box"
+    id="medicineBox"
+  >
+
+    <h3>
+      💊 Detected Medicines
+    </h3>
+
     <div id="medicineList"></div>
+
   </div>
 
+
+  <!-- WARNING -->
+
   <div class="note">
+
     ⚠️ OCR শুধু prescription-এর লেখা শনাক্ত করার জন্য।
-    Medicine বা dosage নেওয়ার আগে অবশ্যই registered doctor/pharmacist-এর
+    OCR ভুল medicine name বা dosage শনাক্ত করতে পারে।
+    কোনো ওষুধ গ্রহণের আগে অবশ্যই doctor/pharmacist-এর
     prescription যাচাই করুন।
+
   </div>
 
 </div>
 
 
+
 <script>
 
-  const imageInput = document.getElementById("imageInput");
-  const preview = document.getElementById("preview");
-  const ocrBtn = document.getElementById("ocrBtn");
-  const chooseBtn = document.getElementById("chooseBtn");
-  const result = document.getElementById("result");
-  const progress = document.getElementById("progress");
-  const copyBtn = document.getElementById("copyBtn");
 
-  const medicineBox = document.getElementById("medicineBox");
-  const medicineList = document.getElementById("medicineList");
+/* =====================================================
+   ELEMENTS
+===================================================== */
 
-  let selectedImage = null;
+const imageInput =
+  document.getElementById("imageInput");
+
+const preview =
+  document.getElementById("preview");
+
+const ocrBtn =
+  document.getElementById("ocrBtn");
+
+const chooseBtn =
+  document.getElementById("chooseBtn");
+
+const result =
+  document.getElementById("result");
+
+const progress =
+  document.getElementById("progress");
+
+const copyBtn =
+  document.getElementById("copyBtn");
+
+const medicineBox =
+  document.getElementById("medicineBox");
+
+const medicineList =
+  document.getElementById("medicineList");
+
+const errorBox =
+  document.getElementById("errorBox");
 
 
-  // ------------------------------------
-  // IMAGE SELECT
-  // ------------------------------------
+let selectedImage = null;
 
-  imageInput.addEventListener("change", function(event) {
 
-    const file = event.target.files[0];
 
-    if (!file) return;
+/* =====================================================
+   IMAGE SELECT
+===================================================== */
+
+imageInput.addEventListener(
+  "change",
+  function(event) {
+
+    const file =
+      event.target.files[0];
+
+    if (!file) {
+      return;
+    }
+
+
+    /* Check image */
+
+    if (!file.type.startsWith("image/")) {
+
+      showError(
+        "Please select a valid image file."
+      );
+
+      return;
+    }
+
 
     selectedImage = file;
 
-    const imageURL = URL.createObjectURL(file);
+
+    /* Preview */
+
+    const imageURL =
+      URL.createObjectURL(file);
 
     preview.src = imageURL;
-    preview.style.display = "block";
 
-    ocrBtn.disabled = false;
+    preview.style.display =
+      "block";
+
+
+    /* Enable OCR */
+
+    ocrBtn.disabled =
+      false;
+
+
+    /* Clear old result */
 
     result.value = "";
 
-    progress.textContent = "✅ Image ready. Press Start OCR.";
-
-    medicineBox.style.display = "none";
     medicineList.innerHTML = "";
 
-  });
+    medicineBox.style.display =
+      "none";
+
+    errorBox.style.display =
+      "none";
 
 
-  // ------------------------------------
-  // CHOOSE ANOTHER IMAGE
-  // ------------------------------------
+    progress.textContent =
+      "✅ Image ready. Press Start OCR.";
 
-  chooseBtn.addEventListener("click", function() {
+  }
+);
+
+
+
+/* =====================================================
+   CHOOSE ANOTHER IMAGE
+===================================================== */
+
+chooseBtn.addEventListener(
+  "click",
+  function() {
 
     imageInput.value = "";
+
     selectedImage = null;
 
     preview.src = "";
-    preview.style.display = "none";
+
+    preview.style.display =
+      "none";
 
     result.value = "";
 
-    progress.textContent = "";
+    medicineList.innerHTML = "";
 
-    ocrBtn.disabled = true;
+    medicineBox.style.display =
+      "none";
 
-    medicineBox.style.display = "none";
+    errorBox.style.display =
+      "none";
 
-  });
-
-
-  // ------------------------------------
-  // IMAGE PREPROCESSING
-  // ------------------------------------
-
-  function preprocessImage(file) {
-
-    return new Promise((resolve, reject) => {
-
-      const img = new Image();
-
-      img.onload = function() {
-
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-
-        let width = img.width;
-        let height = img.height;
-
-        // Increase image resolution for OCR
-        const maxWidth = 1800;
-
-        if (width > maxWidth) {
-
-          const ratio = maxWidth / width;
-
-          width = maxWidth;
-          height = height * ratio;
-
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const imageData =
-          ctx.getImageData(0, 0, width, height);
-
-        const data = imageData.data;
-
-        // Grayscale + contrast
-        for (let i = 0; i < data.length; i += 4) {
-
-          const r = data[i];
-          const g = data[i + 1];
-          const b = data[i + 2];
-
-          let gray =
-            0.299 * r +
-            0.587 * g +
-            0.114 * b;
-
-          // Increase contrast
-          gray = ((gray - 128) * 1.35) + 128;
-
-          gray = Math.max(0, Math.min(255, gray));
-
-          data[i] = gray;
-          data[i + 1] = gray;
-          data[i + 2] = gray;
-
-        }
-
-        ctx.putImageData(imageData, 0, 0);
-
-        resolve(canvas.toDataURL("image/jpeg", 0.95));
-
-      };
-
-      img.onerror = reject;
-
-      img.src = URL.createObjectURL(file);
-
-    });
-
-  }
-
-
-  // ------------------------------------
-  // START OCR
-  // ------------------------------------
-
-  ocrBtn.addEventListener("click", async function() {
-
-    if (!selectedImage) {
-
-      alert("Please choose a prescription image first.");
-
-      return;
-
-    }
-
-    ocrBtn.disabled = true;
-
-    result.value = "";
+    ocrBtn.disabled =
+      true;
 
     progress.textContent =
-      "⏳ Preparing prescription image...";
+      "Please choose a prescription image.";
 
-    try {
+  }
+);
 
-      const processedImage =
-        await preprocessImage(selectedImage);
 
-      progress.textContent =
-        "🔍 Starting OCR... Please wait.";
 
-      // Create Tesseract worker
-      const worker = await Tesseract.createWorker(
-        "eng+ben",
-        1,
-        {
-          logger: function(info) {
+/* =====================================================
+   ERROR
+===================================================== */
 
-            if (info.status) {
+function showError(message) {
 
-              let percent = "";
+  errorBox.style.display =
+    "block";
 
-              if (typeof info.progress === "number") {
+  errorBox.textContent =
+    "❌ " + message;
 
-                percent =
-                  " " +
-                  Math.round(info.progress * 100) +
-                  "%";
+}
 
-              }
 
-              progress.textContent =
-                "🔍 " +
-                info.status +
-                percent;
+
+/* =====================================================
+   IMAGE PREPROCESSING
+===================================================== */
+
+function preprocessImage(file) {
+
+  return new Promise(
+    function(resolve, reject) {
+
+      const img =
+        new Image();
+
+
+      img.onload =
+        function() {
+
+          try {
+
+            const canvas =
+              document.createElement(
+                "canvas"
+              );
+
+            const ctx =
+              canvas.getContext(
+                "2d"
+              );
+
+
+            let width =
+              img.naturalWidth;
+
+            let height =
+              img.naturalHeight;
+
+
+            /*
+              Keep image reasonably large.
+            */
+
+            const maxWidth = 2000;
+
+
+            if (width > maxWidth) {
+
+              const ratio =
+                maxWidth / width;
+
+              width =
+                maxWidth;
+
+              height =
+                Math.round(
+                  height * ratio
+                );
 
             }
 
+
+            canvas.width =
+              width;
+
+            canvas.height =
+              height;
+
+
+            /*
+              Draw image
+            */
+
+            ctx.drawImage(
+              img,
+              0,
+              0,
+              width,
+              height
+            );
+
+
+            /*
+              Get pixels
+            */
+
+            const imageData =
+              ctx.getImageData(
+                0,
+                0,
+                width,
+                height
+              );
+
+
+            const data =
+              imageData.data;
+
+
+            /*
+              Grayscale + contrast
+            */
+
+            for (
+              let i = 0;
+              i < data.length;
+              i += 4
+            ) {
+
+              const r =
+                data[i];
+
+              const g =
+                data[i + 1];
+
+              const b =
+                data[i + 2];
+
+
+              let gray =
+                (0.299 * r) +
+                (0.587 * g) +
+                (0.114 * b);
+
+
+              /*
+                Contrast
+              */
+
+              gray =
+                ((gray - 128) * 1.25) +
+                128;
+
+
+              gray =
+                Math.max(
+                  0,
+                  Math.min(
+                    255,
+                    gray
+                  )
+                );
+
+
+              data[i] =
+                gray;
+
+              data[i + 1] =
+                gray;
+
+              data[i + 2] =
+                gray;
+
+            }
+
+
+            ctx.putImageData(
+              imageData,
+              0,
+              0
+            );
+
+
+            /*
+              Return processed image
+            */
+
+            resolve(
+              canvas.toDataURL(
+                "image/jpeg",
+                0.95
+              )
+            );
+
           }
-        }
+
+          catch(error) {
+
+            reject(error);
+
+          }
+
+        };
+
+
+      img.onerror =
+        function() {
+
+          reject(
+            new Error(
+              "Could not load selected image."
+            )
+          );
+
+        };
+
+
+      img.src =
+        URL.createObjectURL(file);
+
+    }
+  );
+
+}
+
+
+
+/* =====================================================
+   START OCR
+===================================================== */
+
+ocrBtn.addEventListener(
+  "click",
+  async function() {
+
+
+    if (!selectedImage) {
+
+      alert(
+        "Please choose a prescription image first."
       );
 
-      // OCR
-      const { data } =
-        await worker.recognize(processedImage);
+      return;
+    }
 
-      const text =
-        data.text
-          .replace(/\n{3,}/g, "\n\n")
-          .trim();
 
-      if (text) {
+    /*
+      Disable button
+    */
 
-        result.value = text;
+    ocrBtn.disabled =
+      true;
+
+
+    result.value =
+      "";
+
+
+    errorBox.style.display =
+      "none";
+
+
+    medicineBox.style.display =
+      "none";
+
+
+    medicineList.innerHTML =
+      "";
+
+
+    try {
+
+
+      /* -----------------------------------------
+         CHECK TESSERACT
+      ----------------------------------------- */
+
+      if (
+        typeof Tesseract ===
+        "undefined"
+      ) {
+
+        throw new Error(
+          "Tesseract.js could not be loaded. Please check your internet connection."
+        );
+
+      }
+
+
+      /* -----------------------------------------
+         PREPROCESS
+      ----------------------------------------- */
+
+      progress.textContent =
+        "⏳ Preparing prescription image...";
+
+
+      const processedImage =
+        await preprocessImage(
+          selectedImage
+        );
+
+
+      /* -----------------------------------------
+         CREATE WORKER
+      ----------------------------------------- */
+
+      progress.textContent =
+        "🔄 Loading OCR engine...";
+
+
+      const worker =
+        await Tesseract.createWorker(
+          "eng",
+          1,
+          {
+
+            workerPath:
+              "https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/worker.min.js",
+
+            langPath:
+              "https://tessdata.projectnaptha.com/4.0.0",
+
+            corePath:
+              "https://cdn.jsdelivr.net/npm/tesseract.js-core@5.0.5",
+
+            logger:
+              function(info) {
+
+                if (
+                  info &&
+                  info.status
+                ) {
+
+                  let percent =
+                    "";
+
+
+                  if (
+                    typeof info.progress ===
+                    "number"
+                  ) {
+
+                    percent =
+                      " " +
+                      Math.round(
+                        info.progress * 100
+                      ) +
+                      "%";
+
+                  }
+
+
+                  progress.textContent =
+                    "🔍 " +
+                    info.status +
+                    percent;
+
+                }
+
+              }
+
+          }
+        );
+
+
+      /* -----------------------------------------
+         OCR PARAMETERS
+      ----------------------------------------- */
+
+      try {
+
+        await worker.setParameters({
+
+          preserve_interword_spaces:
+            "1"
+
+        });
+
+      }
+
+      catch(parameterError) {
+
+        console.log(
+          "Parameter setting skipped:",
+          parameterError
+        );
+
+      }
+
+
+      /* -----------------------------------------
+         RECOGNIZE
+      ----------------------------------------- */
+
+      progress.textContent =
+        "🔍 Reading prescription...";
+
+
+      const response =
+        await worker.recognize(
+          processedImage
+        );
+
+
+      /* -----------------------------------------
+         GET TEXT
+      ----------------------------------------- */
+
+      let text =
+        "";
+
+
+      if (
+        response &&
+        response.data &&
+        response.data.text
+      ) {
+
+        text =
+          response.data.text
+            .replace(
+              /\r/g,
+              ""
+            )
+            .replace(
+              /\n{3,}/g,
+              "\n\n"
+            )
+            .trim();
+
+      }
+
+
+      /* -----------------------------------------
+         RESULT
+      ----------------------------------------- */
+
+      if (text.length > 0) {
+
+        result.value =
+          text;
+
 
         progress.textContent =
           "✅ OCR completed successfully.";
 
-        detectMedicines(text);
 
-      } else {
+        detectMedicines(
+          text
+        );
+
+      }
+
+      else {
 
         result.value =
           "No readable text was detected.\n\n" +
-          "Please try a clearer prescription image.";
+          "Please try a clearer or higher-quality prescription image.";
+
 
         progress.textContent =
           "⚠️ No readable text found.";
 
       }
 
+
+      /* -----------------------------------------
+         TERMINATE WORKER
+      ----------------------------------------- */
+
       await worker.terminate();
 
     }
 
-    catch (error) {
 
-      console.error(error);
+    catch(error) {
+
+
+      console.error(
+        "OCR ERROR:",
+        error
+      );
+
+
+      const message =
+        error &&
+        error.message
+          ? error.message
+          : String(error);
+
 
       result.value =
         "OCR failed.\n\n" +
-        "Please check your internet connection and try again.\n\n" +
-        "Error: " +
-        error.message;
+        message;
+
 
       progress.textContent =
-        "❌ OCR error.";
+        "❌ OCR failed.";
+
+
+      showError(
+        message
+      );
 
     }
+
 
     finally {
 
-      ocrBtn.disabled = false;
-
-    }
-
-  });
-
-
-  // ------------------------------------
-  // MEDICINE DETECTION
-  // ------------------------------------
-
-  function detectMedicines(text) {
-
-    medicineList.innerHTML = "";
-
-    const lines =
-      text
-        .split("\n")
-        .map(line => line.trim())
-        .filter(line => line.length > 2);
-
-    const possibleMedicines = [];
-
-    lines.forEach(line => {
-
-      const lower = line.toLowerCase();
-
-      // Common medicine indicators
-      const medicineWords = [
-        "tab",
-        "tablet",
-        "cap",
-        "capsule",
-        "syrup",
-        "susp",
-        "injection",
-        "cream",
-        "ointment",
-        "mg",
-        "ml"
-      ];
-
-      const looksLikeMedicine =
-        medicineWords.some(word =>
-          lower.includes(word)
-        );
-
-      if (looksLikeMedicine) {
-
-        possibleMedicines.push(line);
-
-      }
-
-    });
-
-
-    // Remove duplicates
-    const uniqueMedicines =
-      [...new Set(possibleMedicines)];
-
-
-    if (uniqueMedicines.length > 0) {
-
-      medicineBox.style.display = "block";
-
-      uniqueMedicines.forEach(item => {
-
-        const div =
-          document.createElement("div");
-
-        div.className = "medicine";
-
-        div.textContent = "💊 " + item;
-
-        medicineList.appendChild(div);
-
-      });
+      ocrBtn.disabled =
+        false;
 
     }
 
   }
+);
 
 
-  // ------------------------------------
-  // COPY OCR TEXT
-  // ------------------------------------
 
-  copyBtn.addEventListener("click", async function() {
+/* =====================================================
+   DETECT MEDICINES
+===================================================== */
 
-    const text = result.value.trim();
+function detectMedicines(text) {
+
+
+  medicineList.innerHTML =
+    "";
+
+
+  const lines =
+    text
+      .split("\n")
+      .map(
+        function(line) {
+          return line.trim();
+        }
+      )
+      .filter(
+        function(line) {
+          return line.length > 2;
+        }
+      );
+
+
+  const medicineWords = [
+
+    "tab",
+
+    "tablet",
+
+    "cap",
+
+    "capsule",
+
+    "syrup",
+
+    "susp",
+
+    "suspension",
+
+    "injection",
+
+    "cream",
+
+    "ointment",
+
+    "drops",
+
+    "mg",
+
+    "ml",
+
+    "mcg"
+
+  ];
+
+
+  const possibleMedicines =
+    [];
+
+
+  lines.forEach(
+    function(line) {
+
+      const lower =
+        line.toLowerCase();
+
+
+      const looksLikeMedicine =
+        medicineWords.some(
+          function(word) {
+
+            return lower.includes(
+              word
+            );
+
+          }
+        );
+
+
+      if (
+        looksLikeMedicine
+      ) {
+
+        possibleMedicines.push(
+          line
+        );
+
+      }
+
+    }
+  );
+
+
+  /*
+    Remove duplicates
+  */
+
+  const uniqueMedicines =
+    [
+      ...new Set(
+        possibleMedicines
+      )
+    ];
+
+
+  if (
+    uniqueMedicines.length ===
+    0
+  ) {
+
+    return;
+
+  }
+
+
+  medicineBox.style.display =
+    "block";
+
+
+  uniqueMedicines.forEach(
+    function(item) {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+
+      div.className =
+        "medicine";
+
+
+      div.textContent =
+        "💊 " + item;
+
+
+      medicineList.appendChild(
+        div
+      );
+
+    }
+  );
+
+}
+
+
+
+/* =====================================================
+   COPY TEXT
+===================================================== */
+
+copyBtn.addEventListener(
+  "click",
+  async function() {
+
+
+    const text =
+      result.value.trim();
+
 
     if (!text) {
 
-      alert("There is no OCR text to copy.");
+      alert(
+        "There is no OCR text to copy."
+      );
 
       return;
 
     }
 
+
     try {
 
-      await navigator.clipboard.writeText(text);
+
+      /*
+        Modern clipboard
+      */
+
+      await navigator.clipboard.writeText(
+        text
+      );
+
 
       copyBtn.textContent =
         "✅ Copied!";
 
-      setTimeout(() => {
-
-        copyBtn.textContent =
-          "📋 Copy Text";
-
-      }, 2000);
 
     }
 
-    catch (error) {
+    catch(error) {
+
+
+      /*
+        Fallback
+      */
+
+      result.removeAttribute(
+        "readonly"
+      );
+
 
       result.select();
 
-      document.execCommand("copy");
+
+      document.execCommand(
+        "copy"
+      );
+
+
+      result.setAttribute(
+        "readonly",
+        "readonly"
+      );
+
 
       copyBtn.textContent =
         "✅ Copied!";
 
-      setTimeout(() => {
+    }
+
+
+    setTimeout(
+      function() {
 
         copyBtn.textContent =
           "📋 Copy Text";
 
-      }, 2000);
+      },
+      2000
+    );
 
-    }
+  }
+);
 
-  });
 
 </script>
 
+
 </body>
+
 </html>
