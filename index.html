@@ -5,17 +5,12 @@
 
 <meta charset="UTF-8">
 
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>MedAssist - Smart Prescription OCR</title>
 
-
 <!-- Tesseract.js -->
 <script src="https://unpkg.com/tesseract.js@5.0.5/dist/tesseract.min.js"></script>
-
 
 <style>
 
@@ -36,7 +31,6 @@ body{
   margin:auto;
   padding:0 16px 50px;
 }
-
 
 /* HEADER */
 
@@ -59,7 +53,6 @@ body{
   font-size:17px;
 }
 
-
 /* CARD */
 
 .card{
@@ -81,7 +74,6 @@ body{
   margin-bottom:20px;
 }
 
-
 /* FILE INPUT */
 
 #imageInput{
@@ -101,7 +93,6 @@ body{
   cursor:pointer;
 }
 
-
 /* PREVIEW */
 
 #preview{
@@ -112,7 +103,6 @@ body{
   margin-top:15px;
   border-radius:18px;
 }
-
 
 /* BUTTONS */
 
@@ -147,7 +137,6 @@ button{
   color:#087f7b;
 }
 
-
 /* PROGRESS */
 
 #progress{
@@ -160,7 +149,6 @@ button{
   font-weight:bold;
   min-height:48px;
 }
-
 
 /* ERROR */
 
@@ -175,7 +163,6 @@ button{
   line-height:1.5;
   word-break:break-word;
 }
-
 
 /* RESULT */
 
@@ -198,7 +185,6 @@ button{
   line-height:1.7;
   resize:vertical;
 }
-
 
 /* MEDICINE */
 
@@ -243,7 +229,6 @@ button{
   font-weight:bold;
 }
 
-
 /* NOTE */
 
 .note{
@@ -263,7 +248,6 @@ button{
 
 <body>
 
-
 <div class="container">
 
 
@@ -273,12 +257,9 @@ button{
 
 <h1>💊 MedAssist</h1>
 
-<p>
-Your Smart Medicine Assistant
-</p>
+<p>Your Smart Medicine Assistant</p>
 
 </div>
-
 
 
 <!-- OCR CARD -->
@@ -290,11 +271,18 @@ Your Smart Medicine Assistant
 </div>
 
 <div class="description">
-Take or select a clear prescription image.
-MedAssist will extract the prescription text
-and identify possible medicine names.
+Select a prescription image from your Gallery or Files.
+MedAssist will extract the prescription text and identify
+possible medicine names.
 </div>
 
+
+<!--
+IMPORTANT:
+No capture="environment" here.
+This means Android will NOT automatically open Camera.
+The normal Gallery/File Picker will open.
+-->
 
 <label
   class="upload"
@@ -308,7 +296,6 @@ and identify possible medicine names.
   type="file"
   id="imageInput"
   accept="image/*"
-  capture="environment"
 >
 
 
@@ -343,7 +330,6 @@ Please choose a prescription image.
 </div>
 
 
-
 <!-- OCR RESULT -->
 
 <div class="section-title">
@@ -363,7 +349,6 @@ Please choose a prescription image.
 </button>
 
 
-
 <!-- MEDICINE MATCH -->
 
 <div id="medicineBox">
@@ -375,7 +360,6 @@ Please choose a prescription image.
 <div id="medicineList"></div>
 
 </div>
-
 
 
 <!-- SAFETY -->
@@ -391,7 +375,6 @@ prescription যাচাই করুন।
 
 
 </div>
-
 
 
 <script>
@@ -435,7 +418,6 @@ document.getElementById("medicineList");
 let selectedImage = null;
 
 let worker = null;
-
 
 
 /* =====================================================
@@ -497,11 +479,9 @@ const medicineDatabase = [
 "ORS",
 "Salbutamol",
 
-"Ranitidine",
 "Famotidine"
 
 ];
-
 
 
 /* =====================================================
@@ -516,9 +496,7 @@ const file =
 event.target.files[0];
 
 if(!file){
-
 return;
-
 }
 
 
@@ -540,7 +518,6 @@ file;
 preview.src =
 URL.createObjectURL(file);
 
-
 preview.style.display =
 "block";
 
@@ -555,7 +532,6 @@ result.value =
 
 medicineBox.style.display =
 "none";
-
 
 medicineList.innerHTML =
 "";
@@ -572,9 +548,8 @@ progress.textContent =
 );
 
 
-
 /* =====================================================
-   CHOOSE ANOTHER
+   CHOOSE ANOTHER IMAGE
 ===================================================== */
 
 chooseBtn.addEventListener(
@@ -622,7 +597,6 @@ progress.textContent =
 );
 
 
-
 /* =====================================================
    ERROR
 ===================================================== */
@@ -638,9 +612,8 @@ errorBox.textContent =
 }
 
 
-
 /* =====================================================
-   PREPROCESS IMAGE
+   IMAGE PREPROCESSING
 ===================================================== */
 
 function preprocessImage(file){
@@ -671,7 +644,7 @@ let height =
 img.naturalHeight;
 
 
-/* Minimum resolution */
+/* Increase small images */
 
 if(width < 1600){
 
@@ -689,7 +662,7 @@ height * ratio
 }
 
 
-/* Maximum resolution */
+/* Limit very large images */
 
 if(width > 2200){
 
@@ -759,7 +732,7 @@ let gray =
 0.114*b;
 
 
-/* Contrast */
+/* Moderate contrast */
 
 gray =
 ((gray-128)*1.25)+128;
@@ -827,15 +800,13 @@ new Error(
 img.src =
 URL.createObjectURL(file);
 
-}
-);
+});
 
 }
-
 
 
 /* =====================================================
-   OCR
+   START OCR
 ===================================================== */
 
 ocrBtn.addEventListener(
@@ -869,9 +840,7 @@ medicineBox.style.display =
 try{
 
 
-/* -----------------------------------------------
-   CHECK LIBRARY
------------------------------------------------- */
+/* Check Tesseract */
 
 if(
 typeof Tesseract ===
@@ -879,15 +848,13 @@ typeof Tesseract ===
 ){
 
 throw new Error(
-"Tesseract.js failed to load."
+"Tesseract.js failed to load. Please check your internet connection."
 );
 
 }
 
 
-/* -----------------------------------------------
-   PREPROCESS
------------------------------------------------- */
+/* Preprocess */
 
 progress.textContent =
 "⏳ Preparing prescription image...";
@@ -899,9 +866,7 @@ selectedImage
 );
 
 
-/* -----------------------------------------------
-   CREATE WORKER
------------------------------------------------- */
+/* Load OCR */
 
 progress.textContent =
 "⏳ Loading OCR engine...";
@@ -910,17 +875,13 @@ progress.textContent =
 /*
 IMPORTANT:
 
-No specific .wasm.js file is used.
-
-corePath points to the directory.
-
-Tesseract can choose the appropriate
-core from that directory.
+corePath is a DIRECTORY.
+We do NOT force the SIMD file.
 */
 
 worker =
 await Tesseract.createWorker(
-"eng+ben",
+"eng",
 1,
 {
 
@@ -973,9 +934,7 @@ percent;
 );
 
 
-/* -----------------------------------------------
-   OCR PARAMETERS
------------------------------------------------- */
+/* OCR settings */
 
 try{
 
@@ -993,16 +952,14 @@ tessedit_pageseg_mode:
 catch(e){
 
 console.log(
-"Parameters skipped",
+"Optional parameters skipped.",
 e
 );
 
 }
 
 
-/* -----------------------------------------------
-   RECOGNIZE
------------------------------------------------- */
+/* Recognize */
 
 progress.textContent =
 "🔍 Reading prescription...";
@@ -1039,9 +996,7 @@ response.data.text
 }
 
 
-/* -----------------------------------------------
-   RESULT
------------------------------------------------- */
+/* Result */
 
 if(text){
 
@@ -1052,8 +1007,6 @@ text;
 progress.textContent =
 "✅ OCR completed successfully.";
 
-
-/* Medicine matching */
 
 findMedicines(text);
 
@@ -1069,7 +1022,6 @@ progress.textContent =
 "⚠️ No readable text found.";
 
 }
-
 
 }
 catch(error){
@@ -1113,7 +1065,10 @@ await worker.terminate();
 }
 catch(e){
 
-console.log(e);
+console.log(
+"Worker termination:",
+e
+);
 
 }
 
@@ -1132,7 +1087,6 @@ false;
 );
 
 
-
 /* =====================================================
    NORMALIZE TEXT
 ===================================================== */
@@ -1149,15 +1103,13 @@ return text
 }
 
 
-
 /* =====================================================
    LEVENSHTEIN DISTANCE
 ===================================================== */
 
 function levenshtein(a,b){
 
-const matrix =
-[];
+const matrix = [];
 
 
 for(
@@ -1166,7 +1118,7 @@ i<=b.length;
 i++
 ){
 
-matrix[i]=[i];
+matrix[i] = [i];
 
 }
 
@@ -1177,7 +1129,7 @@ j<=a.length;
 j++
 ){
 
-matrix[0][j]=j;
+matrix[0][j] = j;
 
 }
 
@@ -1203,7 +1155,6 @@ matrix[i][j] =
 matrix[i-1][j-1];
 
 }
-
 else{
 
 matrix[i][j] =
@@ -1229,367 +1180,8 @@ return matrix[b.length][a.length];
 }
 
 
-
 /* =====================================================
    SIMILARITY
 ===================================================== */
 
-function similarity(a,b){
-
-a =
-normalizeText(a);
-
-b =
-normalizeText(b);
-
-
-if(!a || !b){
-
-return 0;
-
-}
-
-
-const distance =
-levenshtein(
-a,
-b
-);
-
-
-const maxLength =
-Math.max(
-a.length,
-b.length
-);
-
-
-return (
-1 -
-distance /
-maxLength
-) * 100;
-
-}
-
-
-
-/* =====================================================
-   MEDICINE MATCHING
-===================================================== */
-
-function findMedicines(text){
-
-medicineList.innerHTML =
-"";
-
-
-const lines =
-text
-.split("\n")
-.map(
-line =>
-line.trim()
-)
-.filter(
-line =>
-line.length > 2
-);
-
-
-const matches =
-[];
-
-
-/* -----------------------------------------------
-   Check every OCR line
------------------------------------------------- */
-
-lines.forEach(
-line=>{
-
-let bestMedicine =
-null;
-
-let bestScore =
-0;
-
-
-medicineDatabase.forEach(
-medicine=>{
-
-const score =
-similarity(
-line,
-medicine
-);
-
-
-if(
-score >
-bestScore
-){
-
-bestScore =
-score;
-
-bestMedicine =
-medicine;
-
-}
-
-});
-
-
-/*
-Accept match if similarity is
-reasonable.
-*/
-
-if(
-bestMedicine &&
-bestScore >= 55
-){
-
-matches.push({
-
-ocr:
-line,
-
-medicine:
-bestMedicine,
-
-score:
-Math.round(
-bestScore
-)
-
-});
-
-}
-
-}
-);
-
-
-
-/* Remove duplicates */
-
-const unique =
-[];
-
-const seen =
-new Set();
-
-
-matches.forEach(
-match=>{
-
-if(
-!seen.has(
-match.medicine
-)
-){
-
-seen.add(
-match.medicine
-);
-
-unique.push(
-match
-);
-
-}
-
-}
-);
-
-
-
-/* -----------------------------------------------
-   Display
------------------------------------------------- */
-
-if(
-unique.length === 0
-){
-
-return;
-
-}
-
-
-medicineBox.style.display =
-"block";
-
-
-unique.forEach(
-match=>{
-
-const item =
-document.createElement(
-"div"
-);
-
-item.className =
-"medicine";
-
-
-const name =
-document.createElement(
-"div"
-);
-
-name.className =
-"medicine-name";
-
-
-name.textContent =
-"💊 " +
-match.medicine;
-
-
-const detail =
-document.createElement(
-"div"
-);
-
-detail.className =
-"medicine-match";
-
-
-detail.textContent =
-"OCR: " +
-match.ocr +
-" | Match: " +
-match.score +
-"%";
-
-
-const search =
-document.createElement(
-"div"
-);
-
-search.className =
-"search-button";
-
-
-search.textContent =
-"🔎 Search Medicine";
-
-
-search.onclick =
-function(){
-
-const query =
-encodeURIComponent(
-match.medicine
-);
-
-
-/*
-Google search for now.
-Later we can connect this
-to your WooCommerce medicine
-database.
-*/
-
-window.open(
-"https://www.google.com/search?q=" +
-query,
-"_blank"
-);
-
-};
-
-
-item.appendChild(
-name
-);
-
-item.appendChild(
-detail
-);
-
-item.appendChild(
-search
-);
-
-
-medicineList.appendChild(
-item
-);
-
-}
-);
-
-}
-
-
-
-/* =====================================================
-   COPY
-===================================================== */
-
-copyBtn.addEventListener(
-"click",
-async function(){
-
-const text =
-result.value.trim();
-
-
-if(!text){
-
-alert(
-"No OCR text available."
-);
-
-return;
-
-}
-
-
-try{
-
-await navigator.clipboard.writeText(
-text
-);
-
-}
-catch(e){
-
-result.select();
-
-document.execCommand(
-"copy"
-);
-
-}
-
-
-copyBtn.textContent =
-"✅ Copied!";
-
-
-setTimeout(
-function(){
-
-copyBtn.textContent =
-"📋 Copy Text";
-
-},
-2000
-);
-
-}
-
-);
-
-
-</script>
-
-</body>
-
-</html>
+function similarity
