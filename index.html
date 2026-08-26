@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MedAssist</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f8fb;
+            color: #1f2937;
+        }
+
+        .header {
+            background: #0b8f87;
+            color: white;
+            padding: 28px 20px;
+            text-align: center;
+            border-radius: 0 0 25px 25px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 15px;
+            opacity: 0.95;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 25px 18px;
+        }
+
+        .welcome {
+            margin-bottom: 22px;
+        }
+
+        .welcome h2 {
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+
+        .welcome p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+        }
+
+        .card button {
+            width: 100%;
+            border: none;
+            border-radius: 14px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #0b8f87;
+            color: white;
+        }
+
+        .card button:hover {
+            opacity: 0.9;
+        }
+
+        .icon {
+            font-size: 34px;
+            margin-bottom: 10px;
+        }
+
+        .card h3 {
+            margin-bottom: 6px;
+        }
+
+        .card p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 14px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            font-size: 15px;
+        }
+
+        .search-box button {
+            width: auto;
+            padding: 14px 18px;
+        }
+
+        .footer {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 12px;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <h1>💊 MedAssist</h1>
+        <p>Your Smart Medicine Assistant</p>
+    </header>
+
+    <main class="container">
+
+        <section class="welcome">
+            <h2>Welcome to MedAssist</h2>
+            <p>Understand your prescription and medicine information more easily.</p>
+        </section>
+
+        <!-- Take Photo OCR -->
+        <div class="card">
+            <div class="icon">📷</div>
+
+            <h3>Take Prescription Photo</h3>
+
+            <p>
+                Take a photo of your prescription and extract the medicine names.
+            </p>
+
+            <button onclick="takePhoto()">
+                Take Photo
+            </button>
+        </div>
+
+        <!-- Gallery OCR -->
+        <div class="card">
+            <div class="icon">🖼️</div>
+
+            <h3>Upload from Gallery</h3>
+
+            <p>
+                Select a prescription image from your phone gallery.
+            </p>
+
+            <input
+                type="file"
+                id="galleryInput"
+                accept="image/*"
+                style="display:none"
+                onchange="gallerySelected(event)"
+            >
+
+            <button onclick="openGallery()">
+                Choose Image
+            </button>
+        </div>
+
+        <!-- Medicine Search -->
+        <div class="card">
+            <div class="icon">🔎</div>
+
+            <h3>Search Medicine</h3>
+
+            <p>
+                Search for medicine information.
+            </p>
+
+            <div class="search-box">
+                <input
+                    type="text"
+                    id="medicineInput"
+                    placeholder="Enter medicine name"
+                >
+
+                <button onclick="searchMedicine()">
+                    Search
+                </button>
+            </div>
+        </div>
+
+        <!-- AI Assistant -->
+        <div class="card">
+            <div class="icon">🤖</div>
+
+            <h3>AI Medicine Assistant</h3>
+
+            <p>
+                Ask questions about medicines and prescriptions.
+            </p>
+
+            <button onclick="openAssistant()">
+                Ask AI Assistant
+            </button>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        © 2026 MedAssist
+    </footer>
+
+
+    <script>
+
+        function takePhoto() {
+
+            alert(
+                "Camera OCR will be connected in the next step."
+            );
+
+        }
+
+
+        function openGallery() {
+
+            document
+                .getElementById("galleryInput")
+                .click();
+
+        }
+
+
+        function gallerySelected(event) {
+
+            const file = event.target.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            alert(
+                "Image selected successfully: " + file.name
+            );
+
+        }
+
+
+        function searchMedicine() {
+
+            const medicine =
+                document
+                .getElementById("medicineInput")
+                .value
+                .trim();
+
+            if (!medicine) {
+
+                alert(
+                    "Please enter a medicine name."
+                );
+
+                return;
+            }
+
+            alert(
+                "Medicine search for: " + medicine
+            );
+
+        }
+
+
+        function openAssistant() {
+
+            alert(
+                "AI Assistant will be connected in the next step."
+            );
+
+        }
+
+    </script>
+
+</body>
+</html>
